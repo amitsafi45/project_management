@@ -1,5 +1,7 @@
 import {clients,projects} from '../sampleData.js'
 import {GraphQLID, GraphQLList, GraphQLObjectType, GraphQLSchema, GraphQLString} from 'graphql'
+import Clients from '../model/client.js'
+import Projects from '../model/project.js'
 //client Type
 const ClientType=new GraphQLObjectType({
     name:'Client',
@@ -21,7 +23,13 @@ const ProjectType=new GraphQLObjectType({
       id:{type:GraphQLID},
       name:{type:GraphQLString},
       description:{type:GraphQLString},
-      status:{type:GraphQLString}
+      status:{type:GraphQLString},
+      client:{
+        type:ClientType,
+        resolve(parent,args){
+          return Clients.findById(parent.clientId)
+        }
+      }
     }),
 })
 
@@ -33,26 +41,26 @@ const ProjectType=new GraphQLObjectType({
             type:ProjectType,
             args:{id:{type:GraphQLID}},
             resolve(parent,args){
-                return projects.find(project=>project.id===args.id);
+                return Projects.findById(args.id);
             }
         },
         allProject:{
             type:new GraphQLList(ProjectType),
             resolve(parent,arg){
-                return projects
+                return Projects.find()
             }
         },
         allClient:{
             type:new GraphQLList(ClientType),
             resolve(parent,arg){
-                return clients
+                return Clients.find()
             }
         },
         client:{
             type:ClientType,
             args:{id:{type:GraphQLID}},
             resolve(parent,args){
-                return clients.find(client=>client.id===args.id);
+                return Clients.findById(args.id);
             }
         }
     }
